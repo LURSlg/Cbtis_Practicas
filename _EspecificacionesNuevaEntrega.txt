@@ -1,0 +1,46 @@
+------
+PROYECTO:
+Sistema para registro de pagos de inscripcion hechos por alumnado.
+
+Requisitos: Login (Admin, usuario/secretarias), simple y rapido de registrar pagos.
+
+Les pido especial cuidado en el diseño, este programa administrara dinero, en especial en el javascript del Frontend para funciones.
+
+------
+Entre Monserrat y Paulina van a Desarrollar solo FRONTEND.
+
+Usaran Metodologia BEM, lo deje explicado en _queEsBEM.txt , no toma mas de 5 minutos.
+Les deje una base html css para main.
+
+------ ESPECIFICAIONES (Opcionalmente ahuevo) ------
+- Metodologia BEM.
+- Diseño minimalista.
+- Llamativo; en el sentido de que no sea monotono, apagado o que canse la vista mirarlo.
+- Simple; nada de botones a lo loco; REGLA: nada de uso fuerte o cotidiano debe estar a mas de 2 clicks
+            (como el registar un pago, tal como lo deje)
+- simetria del diseño; filas, columnas, secciones, logos, textos deben estar centrados o relativos a una referencia.
+- Paletas de colores; una que no joda la vista usando losm colores de la institucion
+            pueden ver teoria del color (recomendable)
+
+------ PEDIDOS ESPECIFICOS ------
+necesito que lo mejoren y rellenen los huecos de Bienvenido y Estadisticas, en Bienvenido pueden poner otra cosa de utilidad,
+pueden debatirlo y sugerirlo conmigo.
+NADA DE SCROLL; es decir, para acceder a algo de la pagina el usuario no debe de deslizar,
+    todo lo visible de pantalla sera el area de trabajo; por eso estan encargadas de Diseño, busquen la distribucion de elementos mas adecuada.
+COHERENCIA: como van a hacer entre las dos el trabajo, cada web que codifiquen debera de tener el mismo diseño (proporciones, colores, tamaños); que nada se vea diferente o desentonado.
+
+Estaran ENTERAMENTE encargadas del FRONTEND, lo que involucra diseño html css y javascript basico (nada de servidor o programacion).
+Para que no se asusten, javascript (No Node.js) lo usaran para el frontend (osea lo que se ve) para crear formularios/secciones que aparecen, crear/modificar html de manera dinamica, reedireccion a paginas
+
+Yo me encargare exclusivamente al area de Backend en el levantamiento del servidor y la base de datos, el frontend se lo rifan solitas.
+Pueden hacerlo a mano, usar IA, lo que sea. Pero que el codigo sea coherente y no de problemas con errores/bugs, que no corrompa o sea incompatible con el backend.
+Les encargo especial atencion a los nombres o el como definan los "id" del frontend ya que me seran primordiales para conectar el back con el front, tengan cuidado con estos y no los cambien sin avisar,
+El codigo base que les di pueden modificarlo, siempre respetando las especificaciones que les di.
+Si van a usar Ia que eso no se los discuto, no copien y peguen a la ahi se va, necesito que entiendan que hacen, porque si hay errores de diseño, ustedes responderan por ellos;
+y no es tanto por responsabilidad de ustedes, sera por la comodidad de que puedan hacerle modificaciones ustedes mismas sin corromper nada, asi que aprendan minimo lo que hacen porfavor.
+
+------ ENTREGA -----
+Entrega de algo tangible hasta el Viernes en la noche (maximo sabado para ajustes y platica),
+no front acabado, pero si un avance realista para 3 dias.
+No les pido una cuota de trabajo por dia, pero si resultados el dia de entrega.
+_Viernes 15_

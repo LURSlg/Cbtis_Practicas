@@ -1,0 +1,412 @@
+=============================
+METODOLOGÍA BEM EXPLICADA
+=============================
+
+BEM significa:
+
+B = Block
+E = Element
+M = Modifier
+
+Es una metodología para nombrar clases CSS de manera ordenada,
+clara y fácil de mantener cuando varias personas trabajan
+en el mismo proyecto.
+
+---------------------------------------------------------
+1. ¿POR QUÉ EXISTE BEM?
+---------------------------------------------------------
+
+Sin BEM, muchos proyectos terminan así:
+
+.caja
+.caja2
+.textoRojo
+.botonGrande
+.left
+.right
+
+Problemas:
+- No sabemos qué hace cada clase
+- Los nombres no tienen significado
+- Se generan conflictos entre desarrolladores
+- Es difícil mantener el código
+- Cambiar estilos rompe otras partes
+
+BEM resuelve eso usando reglas claras.
+
+---------------------------------------------------------
+2. BLOCK (BLOQUE)
+---------------------------------------------------------
+
+Un Block es un componente independiente.
+
+Ejemplos:
+
+.header
+.menu
+.card
+.form
+.footer
+
+Un bloque:
+- puede existir solo
+- tiene significado propio
+- representa una sección o componente
+
+Ejemplo:
+
+<form class="form">
+
+La clase "form" es un bloque.
+
+---------------------------------------------------------
+3. ELEMENT (ELEMENTO)
+---------------------------------------------------------
+
+Un Element es una parte del bloque.
+
+Se escribe con:
+
+__ (doble guion bajo)
+
+Ejemplo:
+
+.form__input
+.form__button
+.form__label
+
+Regla:
+Un Element SIEMPRE pertenece a un Block.
+
+Correcto:
+
+<form class="form">
+    <input class="form__input">
+</form>
+
+Aquí:
+- form = Block
+- form__input = Element
+
+---------------------------------------------------------
+4. MODIFIER (MODIFICADOR)
+---------------------------------------------------------
+
+Un Modifier cambia apariencia o comportamiento.
+
+Se escribe con:
+
+-- (doble guion medio)
+
+Ejemplos:
+
+.button--primary
+.button--danger
+.card--active
+
+Ejemplo HTML:
+
+<button class="button button--primary">
+    Guardar
+</button>
+
+Aquí:
+- button = Block
+- button--primary = Modifier
+
+El modifier NO reemplaza al bloque.
+Se usa junto con él.
+
+---------------------------------------------------------
+5. ESTRUCTURA GENERAL
+---------------------------------------------------------
+
+BLOQUE
+.block
+
+ELEMENTO
+.block__element
+
+MODIFICADOR
+.block--modifier
+
+ELEMENTO MODIFICADO
+.block__element--modifier
+
+---------------------------------------------------------
+6. EJEMPLOS REALES
+---------------------------------------------------------
+
+EJEMPLO 1
+
+<div class="card">
+    <h2 class="card__title">
+        Título
+    </h2>
+
+    <p class="card__text">
+        Texto
+    </p>
+</div>
+
+Block:
+card
+
+Elements:
+card__title
+card__text
+
+---------------------------------------------------------
+
+EJEMPLO 2
+
+<button class="button button--danger">
+    Eliminar
+</button>
+
+Block:
+button
+
+Modifier:
+button--danger
+
+---------------------------------------------------------
+
+EJEMPLO 3
+
+<form class="form">
+
+    <input class="form__input">
+
+    <button class="form__button form__button--success">
+        Registrar
+    </button>
+
+</form>
+
+Block:
+form
+
+Elements:
+form__input
+form__button
+
+Modifier:
+form__button--success
+
+---------------------------------------------------------
+7. REGLAS IMPORTANTES
+---------------------------------------------------------
+
+REGLA 1:
+NO describan posición
+
+MAL:
+.left
+.right
+.top
+
+BIEN:
+.sidebar
+.navigation
+.header
+
+Porque el diseño puede cambiar.
+
+---------------------------------------------------------
+
+REGLA 2:
+NO describan colores
+
+MAL:
+.red-button
+
+BIEN:
+.button--danger
+
+Porque mañana puede cambiar de color.
+
+---------------------------------------------------------
+
+REGLA 3:
+Describan RESPONSABILIDAD
+
+MAL:
+.big-text
+
+BIEN:
+.card__title
+
+---------------------------------------------------------
+
+REGLA 4:
+Un Element depende del Block
+
+NO hagan esto:
+
+__input
+
+SIEMPRE:
+
+.form__input
+
+---------------------------------------------------------
+
+REGLA 5:
+Los modifiers no viven solos
+
+MAL:
+
+<button class="--danger">
+
+BIEN:
+
+<button class="button button--danger">
+
+---------------------------------------------------------
+8. VENTAJAS DE BEM
+---------------------------------------------------------
+
+1. Código más ordenado
+
+2. Fácil mantenimiento
+
+3. Menos conflictos entre desarrolladores
+
+4. Escalable para proyectos grandes
+
+5. Clases fáciles de entender
+
+6. CSS más reutilizable
+
+7. Mejor trabajo en equipo
+
+---------------------------------------------------------
+9. EJEMPLO SIN BEM
+---------------------------------------------------------
+
+HTML:
+
+<div class="box">
+    <h2 class="title">
+    </h2>
+</div>
+
+CSS:
+
+.title {
+    color: red;
+}
+
+Problema:
+¿Qué pasa si existen muchos ".title"?
+
+Habrá conflictos.
+
+---------------------------------------------------------
+10. EJEMPLO CON BEM
+---------------------------------------------------------
+
+HTML:
+
+<div class="card">
+    <h2 class="card__title">
+    </h2>
+</div>
+
+CSS:
+
+.card__title {
+    color: red;
+}
+
+Ahora:
+- sabemos a qué pertenece
+- no hay conflictos
+- es escalable
+
+---------------------------------------------------------
+11. EJEMPLO DE PROYECTO
+---------------------------------------------------------
+
+ANTES:
+
+.lateral__izquierdo
+.lateral__derecho
+.estadisticas__inferior
+
+Problema:
+Describen posición visual.
+
+DESPUÉS:
+
+.dashboard__panel
+.dashboard__panel--info
+.dashboard__panel--form
+.dashboard__panel--stats
+
+Ahora describen función.
+
+---------------------------------------------------------
+12. SIMPLIFICACION
+---------------------------------------------------------
+
+¿Qué ES?
+-> Block
+
+¿Qué parte ES?
+-> Element
+
+¿Qué variante TIENE?
+-> Modifier
+
+---------------------------------------------------------
+13. EJEMPLO COMPLETO
+---------------------------------------------------------
+
+<div class="form">
+
+    <input class="form__input">
+
+    <button class="form__button form__button--primary">
+        Guardar
+    </button>
+
+</div>
+
+Block:
+form
+
+Elements:
+form__input
+form__button
+
+Modifier:
+form__button--primary
+
+---------------------------------------------------------
+14. RESUMEN
+---------------------------------------------------------
+
+BEM organiza CSS usando:
+
+.block
+.block__element
+.block--modifier
+
+Sirve para:
+- ordenar proyectos
+- facilitar mantenimiento
+- evitar conflictos
+- trabajar en equipo
+- crear proyectos escalables
+
+BEM NO describe:
+- colores
+- tamaños
+- posiciones
+
+BEM describe:
+- componentes
+- responsabilidades
+- estructura

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Inscripciones</title>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="page">
+
+    <!-- HEADER -->
+    <header class="header">
+
+        <h1 class="header__title">
+            Registro de Inscripciones CBTIS
+        </h1>
+
+        <p class="header__subtitle">
+            Completa el formulario para registrar a un estudiante
+        </p>
+
+    </header>
+
+    <!-- MAIN -->
+    <main class="dashboard">
+
+        <!-- PANEL INFORMACIÓN -->
+        <section class="dashboard__panel dashboard__panel--info">
+
+            <h2 class="dashboard__title">
+                Bienvenido
+            </h2>
+
+            <p class="dashboard__text">
+                Utiliza este formulario para registrar inscripciones de estudiantes.
+            </p>
+
+        </section>
+
+        <!-- PANEL FORMULARIO -->
+        <section class="dashboard__panel dashboard__panel--form">
+
+            <h2 class="dashboard__title">
+                Formulario de Inscripción
+            </h2>
+
+            <form class="form" id="registrationForm">
+
+                <!-- ID -->
+                <div class="form__group">
+
+                    <label class="form__label" for="idControl">
+                        ID Control
+                    </label>
+
+                    <input
+                        class="form__input"
+                        type="number"
+                        id="idControl"
+                        name="idControl"
+                    >
+
+                </div>
+
+                <!-- NOMBRE -->
+                <div class="form__group">
+
+                    <label class="form__label" for="nombre">
+                        Nombre
+                    </label>
+
+                    <input
+                        class="form__input"
+                        type="text"
+                        id="nombre"
+                        name="nombre"
+                    >
+
+                </div>
+
+                <!-- APELLIDO PATERNO -->
+                <div class="form__group">
+
+                    <label class="form__label" for="apellido_paterno">
+                        Apellido Paterno
+                    </label>
+
+                    <input
+                        class="form__input"
+                        type="text"
+                        id="apellido_paterno"
+                        name="apellido_paterno"
+                    >
+
+                </div>
+
+                <!-- APELLIDO MATERNO -->
+                <div class="form__group">
+
+                    <label class="form__label" for="apellido_materno">
+                        Apellido Materno
+                    </label>
+
+                    <input
+                        class="form__input"
+                        type="text"
+                        id="apellido_materno"
+                        name="apellido_materno"
+                    >
+
+                </div>
+
+                <!-- SEMESTRE -->
+                <div class="form__group">
+
+                    <label class="form__label" for="semestre">
+                        Semestre
+                    </label>
+
+                    <select
+                        class="form__select"
+                        id="semestre"
+                        name="semestre"
+                    >
+
+                        <option value="1">1er Semestre</option>
+                        <option value="2">2do Semestre</option>
+                        <option value="3">3er Semestre</option>
+                        <option value="4">4to Semestre</option>
+                        <option value="5">5to Semestre</option>
+                        <option value="6">6to Semestre</option>
+
+                    </select>
+
+                </div>
+
+                <!-- CARRERA -->
+                <div class="form__group">
+
+                    <label class="form__label" for="carrera">
+                        Carrera
+                    </label>
+
+                    <select
+                        class="form__select"
+                        id="carrera"
+                        name="carrera"
+                    >
+
+                        <option value="informatica">
+                            Informática
+                        </option>
+
+                        <option value="administracion">
+                            Administración
+                        </option>
+
+                        <option value="contabilidad">
+                            Contabilidad
+                        </option>
+
+                        <option value="electronica">
+                            Electrónica
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- BOTÓN -->
+                <button
+                    class="form__button form__button--primary"
+                    type="submit"
+                >
+                    Registrar
+                </button>
+
+            </form>
+
+        </section>
+
+        <!-- PANEL ESTADÍSTICAS -->
+        <section class="dashboard__panel dashboard__panel--stats">
+
+            <h2 class="dashboard__title">
+                Estadísticas
+            </h2>
+
+            <p class="stats__text">
+                Total de estudiantes registrados: 0
+            </p>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+
+        <p class="footer__text">
+            &copy; 2026 CBTIS
+        </p>
+
+    </footer>
+
+    <script src="main.js"></script>
+
+</body>
+
+</html>
