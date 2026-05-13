@@ -1,6 +1,9 @@
 ------
 PROYECTO:
 Sistema para registro de pagos de inscripcion hechos por alumnado.
+Este sistema lo usaran las secretarias escolares para registrar a los alumnos que ya pagaron su inscripcion,
+guardarlos en el sistema y validarlos poniendolos en las listas de asistencia si es que pagaron.
+Es importante el especial cuidado al diseño, ya que es probable que este sistema se utilice a diario, o ya muy frecuentemente, asi que debe ser de uso rapido, recuerden que hay mas de mil alumnos, se calificara responsivilidad, diseño, eficacia y UX (experiencia de usuario).
 
 Requisitos: Login (Admin, usuario/secretarias), simple y rapido de registrar pagos.
 
