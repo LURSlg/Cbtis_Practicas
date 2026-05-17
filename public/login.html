@@ -1,1 +1,63 @@
-// aca hacen Login
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - CBTIS</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="page page--login">
+
+    <!-- CONTENEDOR CENTRAL SIMÉTRICO -->
+    <main class="login-container">
+        
+        <!-- TARJETA DE ACCESO COMPACTA -->
+        <div class="login-card">
+            
+            <!-- ENCABEZADO DEL LOGIN -->
+            <header class="login-card__header">
+                <div class="login-card__logo">CBTIS</div>
+                <h1 class="login-card__title">Control de Pagos</h1>
+                <p class="login-card__subtitle">Identifíquese para acceder al sistema</p>
+            </header>
+
+            <!-- FORMULARIO DE ACCESO -->
+            <form class="login-form" id="loginForm" autocomplete="off" action="main.html">
+                
+                <!-- CAMPO: USUARIO / NÓMINA -->
+                <div class="login-form__group">
+                    <label class="login-form__label" for="loginUser">Usuario o Clave</label>
+                    <input class="login-form__input" type="text" id="loginUser" name="loginUser" placeholder="Ej. secretaria_01" required autofocus>
+                </div>
+
+                <!-- CAMPO: CONTRASEÑA -->
+                <div class="login-form__group">
+                    <label class="login-form__label" for="loginPassword">Contraseña</label>
+                    <input class="login-form__input" type="password" id="loginPassword" name="loginPassword" placeholder="••••••••" required>
+                </div>
+
+                <!-- CAMPO: TIPO DE USUARIO (Requisito: Admin / Secretaria) -->
+                <div class="login-form__group">
+                    <label class="login-form__label" for="loginRole">Rol de Acceso</label>
+                    <select class="login-form__select" id="loginRole" name="loginRole" required>
+                        <option value="secretaria">Personal de Ventanilla / Secretaria</option>
+                        <option value="admin">Administrador del Sistema</option>
+                    </select>
+                </div>
+
+                <!-- BOTÓN PRINCIPAL CON HOVER Y TRANSICIÓN -->
+                <button class="login-form__button" type="submit">Ingresar al Sistema</button>
+
+            </form>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER ULTRA COMPACTO -->
+    <footer class="footer">
+        <p>&copy; 2026 CBTIS • Módulo de Autenticación Homologado</p>
+    </footer>
+
+</body>
+</html>

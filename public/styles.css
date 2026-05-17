@@ -1,81 +1,290 @@
+/*                1. VARIABLES, CONFIGURACIÓN GLOBAL Y RESET
+   ========================================================================== */
 :root {
-    --color-primary: #530a0a;
-    --color-secondary: #220808;
-    --color-background: #312d2d;
-    --color-text: #cecece;
+    /* Paleta Institucional Oscura CBTIS */
+    --color-primary: #530a0a;          /* Guinda Oficial CBTIS */
+    --color-primary-hover: #7a1212;    /* Estado Hover interactivo */
+    --color-secondary: #181414;        /* Contenedores Principales */
+    --color-background: #0f0c0c;       /* Fondo General de Pantalla */
+    --color-surface: #262020;          /* Fondo de Campos e Inputs */
+    --color-text: #e3dede;             /* Texto Principal */
+    --color-muted: #9c9393;            /* Texto Secundario */
     --color-white: #ffffff;
+    
+    /* Estados Operativos de Feedback */
+    --color-success: #2e7d32;          /* Verde - Pagado / Éxito */
+    --color-danger: #c62828;           /* Rojo - Adeudo / Error */
+    --color-warning: #f57c00;          /* Amarillo - Advertencia */
 
-    --font-main: Arial, sans-serif;
-
-    --spacing-sm: 10px;
-    --spacing-md: 20px;
-    --radius: 5px;
+    /* Estructura y Animación */
+    --font-main: 'Segoe UI', -apple-system, Roboto, Arial, sans-serif;
+    --radius: 8px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body.page {
-    margin: 0;
     font-family: var(--font-main);
     background-color: var(--color-background);
     color: var(--color-text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Prohibido el scroll en pantalla principal */
 }
 
-/* HEADER */
-
+/*                  2. COMPONENTE: HEADER INSTITUCIONAL
+   ========================================================================== */
 .header {
     background-color: var(--color-primary);
-    padding: var(--spacing-md);
-    text-align: center;
+    padding: 12px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #3d0707;
+}
+
+.header__brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header__logo-placeholder {
+    font-weight: 900;
+    font-size: 1.4rem;
+    background: var(--color-white);
+    color: var(--color-primary);
+    padding: 4px 10px;
+    border-radius: 4px;
 }
 
 .header__title {
-    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-white);
 }
 
 .header__subtitle {
-    margin-top: 10px;
+    font-size: 0.8rem;
+    color: var(--color-muted);
 }
 
-/* DASHBOARD */
-
+/*3. COMPONENTE: DASHBOARD ESTRUCTURAL(La estructura o el cascarón principal de la pantalla de inicio)
+  ==================================================================================================== */
 .dashboard {
+    flex: 1;
     display: grid;
-    grid-template-columns: 40% 60%;
-    gap: var(--spacing-md);
-    padding: var(--spacing-md);
+    grid-template-columns: 45% 55%; /* Formulario */
+    gap: 25px;
+    padding: 25px;
+    height: calc(100vh - 110px);
 }
 
 .dashboard__panel {
-    padding: var(--spacing-md);
-    border-radius: var(--radius);
-}
-
-.dashboard__panel--info {
-    background-color: var(--color-primary);
-}
-
-.dashboard__panel--form {
     background-color: var(--color-secondary);
-    grid-row: span 2;
+    border-radius: var(--radius);
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.02);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
 }
 
-.dashboard__panel--stats {
-    background-color: var(--color-primary);
+.dashboard__panel--left {
+    justify-content: flex-start;
+    gap: 15px;
+}
+
+.dashboard__panel--right {
+    position: relative;
 }
 
 .dashboard__title {
-    margin-top: 0;
+    font-size: 1.1rem;
+    color: var(--color-white);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-left: 4px solid var(--color-primary);
+    padding-left: 10px;
+    margin-bottom: 15px;
 }
 
-/* FORM */
+/*             4. BLOQUES INTERNOS: PANEL IZQUIERDO (MONITOR)
+   ========================================================================== */
+.monitor-section {
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius);
+    padding: 12px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.01);
+    transition: var(--transition);
+}
 
+.monitor-section:hover {
+    background-color: rgba(255, 255, 255, 0.04);
+    border-color: rgba(83, 10, 10, 0.3);
+}
+
+.monitor-section__title {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+
+.status-indicator__dot {
+    width: 10px;
+    height: 10px;
+    background-color: #4caf50;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #4caf50;
+}
+
+.stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.stat-box {
+    background-color: var(--color-surface);
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    transition: var(--transition);
+    border: 1px solid transparent;
+}
+
+.stat-box:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.stat-box__number {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-white);
+}
+
+.stat-box__number--highlight { color: #81c784; }
+.stat-box__label { font-size: 0.75rem; color: var(--color-muted); }
+
+.activity-log {
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.activity-log__item {
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.activity-log__time { color: var(--color-muted); font-size: 0.75rem; }
+
+.action-links {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.action-links__btn {
+    flex: 1;
+    background-color: var(--color-surface);
+    color: var(--color-white);
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: var(--transition);
+}
+
+.action-links__btn:hover {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary-hover);
+    box-shadow: 0 4px 12px rgba(83, 10, 10, 0.3);
+}
+
+/*               5. COMPONENTE: FORMULARIO Y FOCO DE BÚSQUEDA
+   ========================================================================== */
 .form {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    height: 100%;
+    justify-content: space-between;
+}
+
+/* Contenedor del Buscador Principal de 14 dígitos */
+.form__group--priority {
+    background-color: rgba(83, 10, 10, 0.08);
+    padding: 18px;
+    border-radius: var(--radius);
+    border: 1px solid rgba(83, 10, 10, 0.2);
+    margin-bottom: 12px;
+    text-align: center;
+    transition: var(--transition);
+}
+
+.form__group--priority:focus-within {
+    background-color: rgba(83, 10, 10, 0.15);
+    border-color: #901a1a;
+    box-shadow: 0 0 20px rgba(83, 10, 10, 0.25);
+}
+
+.form__label--priority {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-white);
+    display: block;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+
+.form__input--priority {
+    width: 90%;
+    font-size: 1.6rem;
+    font-weight: 700;
+    text-align: center;
+    background-color: var(--color-background);
+    border: 2px solid var(--color-primary);
+    color: var(--color-white);
+    padding: 8px;
+    border-radius: var(--radius);
+    transition: var(--transition);
+    letter-spacing: 1px;
+}
+
+.form__input--priority:focus {
+    outline: none;
+    border-color: #ff4d4d;
+    box-shadow: 0 0 15px rgba(255, 77, 77, 0.5); /* Brillo Neon de Foco */
+}
+
+/* Cuadrícula interna de Datos Escolares */
+.form__sub-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.01);
+    padding: 12px;
+    border-radius: var(--radius);
+    border: 1px solid rgba(255, 255, 255, 0.02);
 }
 
 .form__group {
@@ -83,33 +292,323 @@ body.page {
     flex-direction: column;
 }
 
+.form__group--full-width {
+    grid-column: span 2;
+}
+
 .form__label {
-    margin-bottom: 5px;
+    font-size: 0.75rem;
+    color: var(--color-muted);
+    margin-bottom: 4px;
+    text-transform: uppercase;
 }
 
 .form__input,
 .form__select {
-    padding: var(--spacing-sm);
-    border: none;
+    background-color: var(--color-surface);
+    color: var(--color-white);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    transition: var(--transition);
+}
+
+.form__input:focus,
+.form__select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background-color: rgba(255, 255, 255, 0.03);
+}
+
+.form__input:disabled,
+.form__select:disabled {
+    background-color: rgba(0, 0, 0, 0.25);
+    color: #a0a0a0;
+}
+
+/* Forzar visualización de opciones en fondo oscuro */
+.form__select option {
+    background-color: var(--color-secondary) !important;
+    color: var(--color-white) !important;
+    padding: 10px;
+}
+
+/*       6. COMPONENTE: TABLA DE ADEUDOS Y BARRA DE SCROLL TEMATIZADA
+   ========================================================================== */
+.debts-container {
+    margin: 12px 0;
+    flex: 1;
+    max-height: 110px;
+    overflow-y: auto; /* Scroll permitido exclusivamente aquí */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-primary) rgba(0, 0, 0, 0.3);
+}
+
+/* Scrollbar personalizado para navegadores basados en Webkit 
+(Cambiar el diseño de la barra de desplazamiento para que se vea diferente en navegadores como Chrome) */
+.debts-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.debts-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
     border-radius: var(--radius);
 }
 
-.form__button {
-    padding: var(--spacing-sm);
+.debts-container::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary);
+    border-radius: var(--radius);
+    border: 1px solid var(--color-secondary);
+}
+
+.debts-container::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.debts-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    text-align: left;
+}
+
+.debts-table__th {
+    background-color: rgba(0, 0, 0, 0.3);
+    color: var(--color-muted);
+    padding: 6px 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+.debts-table__td {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.status-badge {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.status-badge--danger { 
+    background-color: rgba(198, 40, 40, 0.15); 
+    color: #ff8a80; 
+    border: 1px solid rgba(198, 40, 40, 0.3); 
+}
+
+.status-badge--success { 
+    background-color: rgba(46, 125, 50, 0.15); 
+    color: #b9f6ca; 
+    border: 1px solid rgba(46, 125, 50, 0.3); 
+}
+
+/*             7. BLOQUE INFERIOR DE ACCIÓN Y BOTÓN DE REGISTRO
+   ========================================================================== */
+.payment-action {
+    display: grid;
+    grid-template-columns: 45% 55%;
+    gap: 15px;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 10px 15px;
+    border-radius: var(--radius);
+}
+
+.form__button-submit {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 12px;
     border: none;
     border-radius: var(--radius);
     cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 10px rgba(83, 10, 10, 0.2);
 }
 
-.form__button--primary {
-    background-color: var(--color-primary);
+.form__button-submit:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(83, 10, 10, 0.4);
+}
+
+.form__button-submit:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.form__button-submit:disabled {
+    background-color: #221c1c;
+    color: #555;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/*                8. COMPONENTES ADICIONALES: ALERTAS Y FOOTER
+   ========================================================================== */
+.alert-banner {
+    position: absolute;
+    top: 15px;
+    left: 22px;
+    right: 22px;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    z-index: 10;
+}
+
+.alert-banner--hidden { display: none; }
+.alert-banner--success { background-color: var(--color-success); color: var(--color-white); }
+.alert-banner--warning { background-color: var(--color-warning); color: var(--color-white); }
+.alert-banner--danger { background-color: var(--color-danger); color: var(--color-white); }
+
+.footer {
+    background-color: #0b0909;
+    padding: 6px 30px;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--color-muted);
+}
+
+/*    9. COMPONENTE: PANTALLA DE LOGIN UNIFICADA (Sección 2.4 - Coherencia)
+   ========================================================================== */
+.page--login {
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+}
+
+/* Tarjeta contenedora simétrica */
+.login-card {
+    background-color: var(--color-secondary);
+    border-radius: var(--radius);
+    padding: 35px;
+    width: 100%;
+    max-width: 420px;
+    border: 1px solid rgba(255, 255, 255, 0.02);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7);
+    text-align: center;
+    transition: var(--transition);
+}
+
+.login-card:hover {
+    border-color: rgba(83, 10, 10, 0.2);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+}
+
+/* Encabezado e Identidad CBTIS */
+.login-card__header {
+    margin-bottom: 25px;
+}
+
+.login-card__logo {
+    display: inline-block;
+    font-weight: 900;
+    font-size: 1.6rem;
+    background: var(--color-white);
+    color: var(--color-primary);
+    padding: 6px 14px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+}
+
+.login-card__title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-white);
+    margin-bottom: 4px;
+}
+
+.login-card__subtitle {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+}
+
+/* Estructura del formulario interno */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    text-align: left;
+}
+
+.login-form__group {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-form__label {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.login-form__input,
+.login-form__select {
+    background-color: var(--color-surface);
+    color: var(--color-white);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 12px;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    transition: var(--transition);
+}
+
+/* Brillo interactivo en el foco del Login */
+.login-form__input:focus,
+.login-form__select:focus {
+    outline: none;
+    border-color: var(--color-primary-hover);
+    background-color: rgba(255, 255, 255, 0.02);
+    box-shadow: 0 0 10px rgba(83, 10, 10, 0.4);
+}
+
+/* Forzar color de fondo en opciones del select del login */
+.login-form__select option {
+    background-color: var(--color-secondary);
     color: var(--color-white);
 }
 
-/* FOOTER */
+/* Botón de envío del Login */
+.login-form__button {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 14px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    margin-top: 10px;
+    transition: var(--transition);
+    box-shadow: 0 4px 12px rgba(83, 10, 10, 0.2);
+}
 
-.footer {
-    background-color: var(--color-secondary);
-    padding: var(--spacing-md);
-    text-align: center;
+.login-form__button:hover {
+    background-color: var(--color-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(83, 10, 10, 0.4);
+}
+
+.login-form__button:active {
+    transform: translateY(1px);
 }
