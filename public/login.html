@@ -8,56 +8,109 @@
 </head>
 <body class="page page--login">
 
-    <!-- CONTENEDOR CENTRAL SIMÉTRICO -->
     <main class="login-container">
         
-        <!-- TARJETA DE ACCESO COMPACTA -->
         <div class="login-card">
             
-            <!-- ENCABEZADO DEL LOGIN -->
             <header class="login-card__header">
                 <div class="login-card__logo">CBTIS</div>
                 <h1 class="login-card__title">Control de Pagos</h1>
                 <p class="login-card__subtitle">Identifíquese para acceder al sistema</p>
             </header>
 
-            <!-- FORMULARIO DE ACCESO -->
-            <form class="login-form" id="loginForm" autocomplete="off" action="main.html">
+            <form class="login-form" id="loginForm" autocomplete="off">
                 
-                <!-- CAMPO: USUARIO / NÓMINA -->
                 <div class="login-form__group">
                     <label class="login-form__label" for="loginUser">Usuario o Clave</label>
                     <input class="login-form__input" type="text" id="loginUser" name="loginUser" placeholder="Ej. secretaria_01" required autofocus>
                 </div>
 
-                <!-- CAMPO: CONTRASEÑA -->
                 <div class="login-form__group">
                     <label class="login-form__label" for="loginPassword">Contraseña</label>
                     <input class="login-form__input" type="password" id="loginPassword" name="loginPassword" placeholder="••••••••" required>
                 </div>
 
-                <!-- CAMPO: TIPO DE USUARIO (Requisito: Admin / Secretaria) -->
-                <div class="login-form__group">
-                    <label class="login-form__label" for="loginRole">Rol de Acceso</label>
-                    <select class="login-form__select" id="loginRole" name="loginRole" required>
-                        <option value="secretaria">Personal de Ventanilla / Secretaria</option>
-                        <option value="admin">Administrador del Sistema</option>
-                    </select>
-                </div>
+                <div id="loginError" class="auth-form__error" aria-live="polite"></div>
 
-                <!-- BOTÓN PRINCIPAL CON HOVER Y TRANSICIÓN -->
                 <button class="login-form__button" type="submit">Ingresar al Sistema</button>
-
             </form>
 
-        </div>
+            <div id="recoverySection" class="login-form" style="display: none; margin-top: 5px; border-top: 1px solid #333; padding-top: 15px;">
+                <header class="login-card__header" style="margin-bottom: 15px;">
+                    <div style="color: #e57373; font-size: 1.2rem; margin-bottom: 5px;">🔒</div>
+                    <h2 class="login-card__title" style="font-size: 1.1rem;">Recuperar Administrador</h2>
+                    <p id="recoveryQuestionLabel" class="login-card__subtitle" style="font-style: italic; color: #aaa; padding: 0 10px;">
+                        Cargando pregunta de seguridad...
+                    </p>
+                </header>
+                
+                <div class="login-form__group">
+                    <label class="login-form__label" for="recoveryAnswer">Tu Respuesta Secreta</label>
+                    <input class="login-form__input" type="password" id="recoveryAnswer" placeholder="Escribe la respuesta">
+                </div>
+                
+                <div class="login-form__group">
+                    <label class="login-form__label" for="recoveryNewPass">Nueva Contraseña</label>
+                    <input class="login-form__input" type="password" id="recoveryNewPass" placeholder="Mínimo 6 caracteres">
+                </div>
+                
+                <div id="recoveryError" class="auth-form__error" style="margin-bottom: 10px;" aria-live="polite"></div>
+                <div id="recoverySuccess" style="color: #81c784; font-size: 0.85rem; text-align: center; margin-bottom: 10px;"></div>
+                
+                <button type="button" class="login-form__button" id="btnSubmitRecovery" style="background: #e57373;">Restablecer Acceso</button>
+                <button type="button" id="btnCancelRecovery" style="background: transparent; border: none; color: #888; display: block; margin: 15px auto 0 auto; font-size: 0.8rem; cursor: pointer; text-decoration: underline;">
+                    Volver al inicio
+                </button>
+            </div>
 
+            <a href="#" id="linkForgot" style="display: none; text-align: center; font-size: 0.8rem; margin-top: 15px; color: #888; text-decoration: none; transition: color 0.2s;">
+                Olvidé mi contraseña (Solo Admin)
+            </a>
+
+            <button type="button" id="linkRequestAccount" style="display: block; width: 100%; background: transparent; border: none; color: #81c784; font-size: 0.85rem; margin-top: 12px; cursor: pointer; text-decoration: underline;">
+                ¿No tienes cuenta? Solicitar acceso al administrador
+            </button>
+
+            <div id="requestSection" class="login-form" style="display: none; margin-top: 5px; border-top: 1px solid #333; padding-top: 15px;">
+                <header class="login-card__header" style="margin-bottom: 15px;">
+                    <h2 class="login-card__title" style="font-size: 1.1rem;">Solicitar cuenta de operador</h2>
+                    <p class="login-card__subtitle">El administrador revisará tu solicitud y te activará el acceso.</p>
+                </header>
+
+                <div class="login-form__group">
+                    <label class="login-form__label" for="reqUsername">Usuario deseado</label>
+                    <input class="login-form__input" type="text" id="reqUsername" placeholder="Ej. caja_01" maxlength="24">
+                </div>
+                <div class="login-form__group">
+                    <label class="login-form__label" for="reqNombre">Nombre completo</label>
+                    <input class="login-form__input" type="text" id="reqNombre" placeholder="Tu nombre">
+                </div>
+                <div class="login-form__group">
+                    <label class="login-form__label" for="reqPassword">Contraseña que usarás</label>
+                    <input class="login-form__input" type="password" id="reqPassword" placeholder="Mínimo 6 caracteres">
+                </div>
+                <div class="login-form__group">
+                    <label class="login-form__label" for="reqMotivo">Motivo / área (opcional)</label>
+                    <input class="login-form__input" type="text" id="reqMotivo" placeholder="Ej. Caja matutino">
+                </div>
+
+                <div id="requestError" class="auth-form__error" aria-live="polite"></div>
+                <div id="requestSuccess" style="color: #81c784; font-size: 0.85rem; text-align: center; margin-bottom: 10px;"></div>
+                <div id="requestPending" style="display:none;color:#ffb74d;font-size:0.85rem;text-align:center;margin-bottom:10px;"></div>
+
+                <button type="button" class="login-form__button" id="btnSubmitRequest">Enviar solicitud</button>
+                <button type="button" id="btnCancelRequest" style="background: transparent; border: none; color: #888; display: block; margin: 15px auto 0 auto; font-size: 0.8rem; cursor: pointer; text-decoration: underline;">
+                    Volver al inicio
+                </button>
+            </div>
+
+        </div>
     </main>
 
-    <!-- FOOTER ULTRA COMPACTO -->
     <footer class="footer">
         <p>&copy; 2026 CBTIS • Módulo de Autenticación Homologado</p>
     </footer>
 
+    <script src="auth.js"></script>
 </body>
 </html>

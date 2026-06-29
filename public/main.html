@@ -8,7 +8,6 @@
 </head>
 <body class="page">
 
-    <!-- HEADER INSTITUCIONAL -->
     <header class="header">
         <div class="header__brand">
             <div class="header__logo-placeholder">CBTIS</div>
@@ -17,19 +16,45 @@
                 <p class="header__subtitle">Centro de Bachillerato Tecnológico Industrial y de Servicios (CBTIS)</p>
             </div>
         </div>
+        <div class="header__actions">
+            <button id="accountButton" type="button" class="account-button" aria-haspopup="true" aria-expanded="false" title="Cuenta">
+                <svg class="account-button__icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+            </button>
+            <div id="accountMenu" class="account-menu hidden">
+                <div class="account-menu__header">Cuenta</div>
+                <div id="accountMenuNotLogged" class="account-menu__group">
+                    <button type="button" class="account-menu__item" data-action="openLogin">
+                        <svg class="account-menu__icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                        Iniciar sesión
+                    </button>
+                </div>
+                <div id="accountMenuLogged" class="account-menu__group hidden">
+                    <div class="account-menu__user">Conectado como <strong id="accountUsername"></strong></div>
+                    <button type="button" class="account-menu__item" data-action="logout">
+                        <svg class="account-menu__icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h10v2H4v12h10v2H4c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2z"/>
+                        </svg>
+                        Cerrar sesión
+                    </button>
+                </div>
+            </div>
+        </div>
     </header>
 
-    <!-- CUERPO PRINCIPAL DEL SISTEMA (MÁS ANCHO A LA IZQUIERDA) -->
     <main class="dashboard">
 
-        <!-- PANEL IZQUIERDO: MONITOR Y ENLACES A REPOSITORIOS O COMPROBANTES -->
+        <!-- PANEL IZQUIERDO: MONITOR -->
         <section class="dashboard__panel dashboard__panel--left">
             
             <div class="monitor-section">
                 <h3 class="monitor-section__title">Estado de Terminal</h3>
                 <div class="status-indicator">
-                    <div class="status-indicator__dot"></div>
-                    <span>Sistema Conectado • Turno Activo</span>
+                    <div class="status-indicator__dot" id="statusDot"></div>
+                    <span id="statusLabel">Sistema Conectado • Turno Activo</span>
                 </div>
             </div>
 
@@ -47,62 +72,55 @@
                 </div>
             </div>
 
-            <div class="monitor-section" style="flex: 1; display: flex; flex-direction: column;">
+            <div class="monitor-section" style="flex:1;display:flex;flex-direction:column;">
                 <h3 class="monitor-section__title">Últimos Movimientos</h3>
                 <div class="activity-log" id="activityLog">
-                    <div class="activity-log__item" style="color: var(--color-muted);">
-                        <span class="activity-log__time">[Sistema]:</span> Listo para operaciones matutinas.
+                    <div class="activity-log__item" style="color:var(--color-muted);">
+                        <span class="activity-log__time">[Sistema]:</span> Listo para operaciones.
                     </div>
                 </div>
             </div>
 
-            <!-- SECCIÓN DE ACCIONES SECUNDARIAS -->
             <div class="action-links">
-                <a href="#" class="action-links__btn">📋 Listas de Asistencia</a>
-                <a href="#" class="action-links__btn">📂 Historial de Comprobantes</a>
+                <a href="lists.html" class="action-links__btn">📋 Listas de Asistencia</a>
+                <a href="admin.html" class="action-links__btn">⚙️ Administración</a>
             </div>
 
         </section>
 
-        <!-- PANEL DERECHO: FORMULARIO COMPACTO -->
+        <!-- PANEL DERECHO: FORMULARIO -->
         <section class="dashboard__panel dashboard__panel--right">
             
             <div id="alertBanner" class="alert-banner alert-banner--hidden"></div>
-
             <h2 class="dashboard__title">Módulo de Validación Inmediata</h2>
             
             <form class="form" id="registrationForm" autocomplete="off">
-                
-                <!-- BUSCADOR PRIORITARIO (14 DÍGITOS) -->
+
+                <!-- BUSCADOR PRINCIPAL -->
                 <div class="form__group--priority">
-                    <label class="form__label--priority" for="idControl">INGRESE NÚMERO DE CONTROL</label>
-                    <input class="form__input--priority" type="text" id="idControl" name="idControl" placeholder="00000000000000" maxlength="14" inputmode="numeric" autofocus required>
+                    <label class="form__label--priority" for="idControl">NÚMERO DE CONTROL</label>
+                    <input class="form__input--priority" type="text" id="idControl" name="idControl"
+                           maxlength="14" inputmode="numeric" autofocus required>
+                    <div class="suggestions-panel" id="suggestionsContainer" aria-live="polite"></div>
                 </div>
 
-                <!-- DATOS ACADÉMICOS REESPECIFICADOS -->
+                <!-- DATOS DEL ALUMNO -->
                 <div class="form__sub-grid">
-                    
-                    <!-- NOMBRE COMPLETO -->
                     <div class="form__group form__group--full-width">
                         <label class="form__label" for="nombre">Nombre(s)</label>
                         <input class="form__input" type="text" id="nombre" name="nombre" placeholder="-" disabled>
                     </div>
-
-                    <!-- APELLIDOS ABAJO EN LA MISMA FILA -->
                     <div class="form__group">
                         <label class="form__label" for="apellido_paterno">Apellido Paterno</label>
-                        <input class="form__input" type="text" id="apellido_paterno" name="apellido_paterno" placeholder="-" disabled>
+                        <input class="form__input" type="text" id="apellido_paterno" placeholder="-" disabled>
                     </div>
-
                     <div class="form__group">
                         <label class="form__label" for="apellido_materno">Apellido Materno</label>
-                        <input class="form__input" type="text" id="apellido_materno" name="apellido_materno" placeholder="-" disabled>
+                        <input class="form__input" type="text" id="apellido_materno" placeholder="-" disabled>
                     </div>
-
-                    <!-- CARRERA TÉCNICA -->
                     <div class="form__group form__group--full-width">
-                        <label class="form__label" for="carrera">Carrera Técnica Asignada</label>
-                        <select class="form__select" id="carrera" name="carrera" disabled>
+                        <label class="form__label" for="carrera">Carrera Técnica</label>
+                        <select class="form__select" id="carrera" disabled>
                             <option value="">-</option>
                             <option value="informatica">Programación / Informática</option>
                             <option value="administracion">Administración de Recursos Humanos</option>
@@ -112,44 +130,110 @@
                     </div>
                 </div>
 
-                <!-- TABLA DE SEMESTRES EN ADEUDO -->
-                <div class="debts-container">
-                    <table class="debts-table">
-                        <thead>
-                            <tr>
-                                <th class="debts-table__th">Semestre</th>
-                                <th class="debts-table__th">Estatus de Pago</th>
-                            </tr>
-                        </thead>
-                        <tbody id="debtsTableBody">
-                            <tr>
-                                <td class="debts-table__td" colspan="2" style="color: var(--color-muted); text-align: center;">Ingrese un ID para consultar adeudos</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- TABLA DE ESTADO POR SEMESTRE — más grande y visible -->
+                <div class="debts-section">
+                    <div class="debts-section__header">
+                        <span class="debts-section__title">Estado de Pagos por Semestre</span>
+                        <span class="debts-section__hint" id="debtsSummary">—</span>
+                    </div>
+                    <div class="debts-container debts-container--expanded">
+                        <table class="debts-table">
+                            <thead>
+                                <tr>
+                                    <th class="debts-table__th">Semestre</th>
+                                    <th class="debts-table__th">Estatus</th>
+                                    <th class="debts-table__th">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="debtsTableBody">
+                                <tr>
+                                    <td class="debts-table__td" colspan="3" style="color:var(--color-muted);text-align:center;">
+                                        Ingrese un número de control para consultar
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <!-- SECCIÓN INFERIOR DE REGISTRO ACTIVO -->
+                <!-- COMPROBANTE (solo texto) -->
+                <div class="form__sub-grid" id="comprobanteSection">
+                    <div class="form__group">
+                        <label class="form__label" for="tipoReferencia">Tipo de referencia</label>
+                        <select class="form__select" id="tipoReferencia" disabled>
+                            <option value="">Seleccione...</option>
+                            <option value="SPEI">SPEI / Clave de rastreo</option>
+                            <option value="OXXO">OXXO / Referencia tienda</option>
+                            <option value="DEPOSITO">Depósito bancario</option>
+                            <option value="TRANSFERENCIA">Transferencia</option>
+                            <option value="FOLIO">Folio / Recibo</option>
+                            <option value="OTRO">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form__group">
+                        <label class="form__label" for="referencia">Referencia / ID de pago</label>
+                        <input class="form__input" type="text" id="referencia" placeholder="Ej. clave SPEI, folio OXXO..." disabled maxlength="80">
+                    </div>
+                </div>
+
+                <!-- ACCIÓN DE REGISTRO -->
                 <div class="payment-action">
                     <div class="form__group">
                         <label class="form__label" for="semestre">Semestre a Pagar</label>
-                        <select class="form__select" id="semestre" name="semestre" required disabled>
+                        <select class="form__select" id="semestre" required disabled>
                             <option value="">Seleccione...</option>
                         </select>
                     </div>
-                    <button class="form__button-submit" type="submit" id="btnSubmit" disabled>Registrar Pago</button>
+                    <button class="form__button-submit" type="submit" id="btnSubmit" disabled>
+                        Registrar Pago
+                    </button>
                 </div>
 
             </form>
-
         </section>
-
     </main>
 
     <footer class="footer">
         <p>&copy; 2026 CBTIS • Panel Administrativo Homologado</p>
     </footer>
 
+    <!-- MODAL DE AUTH -->
+    <div id="authModal" class="auth-modal hidden">
+        <div class="auth-modal__backdrop" id="authModalBackdrop"></div>
+        <div class="auth-modal__dialog">
+            <div class="auth-modal__header">
+                <div>
+                    <p class="auth-modal__eyebrow">Sistema CBTIS</p>
+                    <h2 class="auth-modal__title">Iniciar sesión</h2>
+                </div>
+                <button class="auth-modal__close" id="authModalClose">✕</button>
+            </div>
+            <div class="auth-form">
+                <div class="auth-form__field">
+                    <label for="loginUser">Usuario</label>
+                    <input type="text" id="loginUser" placeholder="Tu usuario">
+                </div>
+                <div class="auth-form__field">
+                    <label for="loginPass">Contraseña</label>
+                    <input type="password" id="loginPass" placeholder="••••••••">
+                </div>
+                <p class="auth-form__error" id="loginError"></p>
+                <div class="auth-form__actions">
+                    <button type="button" class="form__button-submit" id="loginSubmit" style="width:100%">Entrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pageLock" class="page-lock hidden">
+        <div class="page-lock__panel">
+            <h2>Sesión requerida</h2>
+            <p>Inicia sesión para usar el sistema.</p>
+            <button id="pageLockLogin" class="form__button-submit">Iniciar sesión</button>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
     <script src="main.js"></script>
 </body>
 </html>
