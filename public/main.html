@@ -47,7 +47,6 @@
 
     <main class="dashboard">
 
-        <!-- PANEL IZQUIERDO: MONITOR -->
         <section class="dashboard__panel dashboard__panel--left">
             
             <div class="monitor-section">
@@ -88,7 +87,6 @@
 
         </section>
 
-        <!-- PANEL DERECHO: FORMULARIO -->
         <section class="dashboard__panel dashboard__panel--right">
             
             <div id="alertBanner" class="alert-banner alert-banner--hidden"></div>
@@ -96,7 +94,6 @@
             
             <form class="form" id="registrationForm" autocomplete="off">
 
-                <!-- BUSCADOR PRINCIPAL -->
                 <div class="form__group--priority">
                     <label class="form__label--priority" for="idControl">NÚMERO DE CONTROL</label>
                     <input class="form__input--priority" type="text" id="idControl" name="idControl"
@@ -104,7 +101,6 @@
                     <div class="suggestions-panel" id="suggestionsContainer" aria-live="polite"></div>
                 </div>
 
-                <!-- DATOS DEL ALUMNO -->
                 <div class="form__sub-grid">
                     <div class="form__group form__group--full-width">
                         <label class="form__label" for="nombre">Nombre(s)</label>
@@ -119,13 +115,13 @@
                         <input class="form__input" type="text" id="apellido_materno" placeholder="-" disabled>
                     </div>
                     <div class="form__group form__group--full-width">
-    <label class="form__label" for="carrera">Carrera Técnica / Especialidad</label>
-    <select class="form__select" id="carrera" disabled>
-        <option value="">Cargando especialidades oficiales desde Excel...</option>
-    </select>
-</div>
+                        <label class="form__label" for="carrera">Carrera Técnica / Especialidad</label>
+                        <select class="form__select" id="carrera" disabled>
+                            <option value="">Cargando especialidades oficiales desde Excel...</option>
+                        </select>
+                    </div>
+                </div>
 
-                <!-- TABLA DE ESTADO POR SEMESTRE — más grande y visible -->
                 <div class="debts-section">
                     <div class="debts-section__header">
                         <span class="debts-section__title">Estado de Pagos por Semestre</span>
@@ -151,7 +147,6 @@
                     </div>
                 </div>
 
-                <!-- COMPROBANTE (solo texto) -->
                 <div class="form__sub-grid" id="comprobanteSection">
                     <div class="form__group">
                         <label class="form__label" for="tipoReferencia">Tipo de referencia</label>
@@ -171,7 +166,6 @@
                     </div>
                 </div>
 
-                <!-- ACCIÓN DE REGISTRO -->
                 <div class="payment-action">
                     <div class="form__group">
                         <label class="form__label" for="semestre">Semestre a Pagar</label>
@@ -192,7 +186,6 @@
         <p>&copy; 2026 CBTIS • Panel Administrativo Homologado</p>
     </footer>
 
-    <!-- MODAL DE AUTH -->
     <div id="authModal" class="auth-modal hidden">
         <div class="auth-modal__backdrop" id="authModalBackdrop"></div>
         <div class="auth-modal__dialog">
