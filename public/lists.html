@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Alumnos con Inscripción Pagada - CBTIS</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .lists-wrapper {
+      padding: 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .table-section {
+      margin-top: 5px;
+      margin-bottom: 40px;
+    }
+    .lists-table__wrap {
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow-x: auto;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .debts-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    /* ==========================================================================
+       FORZADO ULTRA-COMPACTO PARA EL MODAL DE HISTORIAL (DESTRUYE SCROLLS)
+       ========================================================================== */
+    .modal-historial-fijo {
+      max-width: 1150px !important; /* Forzamos ancho suficiente para ver las 6 columnas */
+      width: 95% !important;
+      height: auto !important;
+      max-height: 90vh !important;
+      overflow: visible !important; /* Cero recortes ocultos */
+    }
+
+    .wrap-historial-fijo {
+      max-height: none !important;
+      overflow-y: visible !important;
+      overflow-x: visible !important;
+      border: none !important;
+      background: transparent !important;
+    }
+
+    /* Forzado de celdas súper compactas para que quepa todo el desglose en un vistazo */
+    .tabla-historial-compacta {
+      width: 100% !important;
+      min-width: 100% !important;
+      border-collapse: collapse !important;
+    }
+
+    .tabla-historial-compacta th,
+    .tabla-historial-compacta td {
+      padding: 6px 10px !important; /* Padding mínimo para eliminar la gordura de las filas */
+      font-size: 0.82rem !important;
+      line-height: 1.2 !important;
+      height: auto !important;
+      white-space: nowrap !important; /* Evita que los textos colapsen en dos renglones */
+    }
+  </style>
+</head>
+<body class="page page--lists">
+
+  <header class="header">
+    <div class="header__brand">
+      <div class="header__logo-placeholder">CBTIS</div>
+      <div>
+        <h1 class="header__title">Alumnos con Inscripción Pagada</h1>
+        <p class="header__subtitle">Consulta por Turno, Especialidad y Semestre</p>
+      </div>
+    </div>
+    <div class="header__actions" style="display: flex; gap: 8px;">
+      <button id="btnOpenColumns" type="button" class="button-secondary" style="background: var(--color-background); border: 1px solid rgba(255,255,255,0.15); font-size: 0.9rem;">
+        👁️ Columnas
+      </button>
+      <button id="btnOpenCosts" type="button" class="button-secondary" style="background: var(--color-background); border: 1px solid rgba(255,255,255,0.15); font-size: 0.9rem;">
+        ⚙️ Costos
+      </button>
+      <a href="main.html" class="button-secondary button-secondary--main" style="font-size: 0.9rem;">← Regresar</a>
+    </div>
+  </header>
+
+  <div id="pageLock" class="page-lock hidden">
+    <div class="page-lock__panel">
+      <h2>Sesión requerida</h2>
+      <p>Inicia sesión para usar el sistema.</p>
+      <button id="pageLockLogin" class="form__button-submit">Iniciar sesión</button>
+    </div>
+  </div>
+
+  <main class="lists-wrapper">
+
+    <section class="lists-top" style="margin-bottom: 0; padding-bottom: 0;">
+      <div>
+        <h2 class="lists-title">Alumnos con derecho a lista de asistencia</h2>
+        <p class="lists-description">Muestra quienes tienen inscripción pagada. Al filtrar el mismo Turno, Especialidad y Semestre, se habilitan las opciones de lista de asistencia.</p>
+      </div>
+    </section>
+
+    <div class="list-filters">
+      <label class="filter-item">Especialidad
+        <select id="carreraFilter"><option value="">Todas</option></select>
+      </label>
+      <label class="filter-item">Semestre
+        <select id="semestreFilter">
+          <option value="">Todos</option>
+          <option value="1">1° (Propedéutico)</option>
+          <option value="2">2°</option>
+          <option value="3">3°</option>
+          <option value="4">4°</option>
+          <option value="5">5°</option>
+          <option value="6">6°</option>
+        </select>
+      </label>
+      <label class="filter-item" id="grupoFilterContainer">Grupo
+        <select id="grupoFilter">
+          <option value="">Todos</option>
+        </select>
+      </label>
+      <label class="filter-item">Turno
+        <select id="turnoFilter"><option value="">Todos</option></select>
+      </label>
+      <label class="filter-item">Pago
+        <select id="pagadoFilter">
+          <option value="paid">Pagados</option>
+          <option value="unpaid">No pagados</option>
+          <option value="all">Todos</option>
+        </select>
+      </label>
+      <div class="filter-actions">
+        <span class="filter-hint" id="filterHint">Filtra por Turno + Especialidad + Semestre para habilitar las opciones de lista.</span>
+      </div>
+    </div>
+
+    <div id="listActions" class="list-actions hidden">
+      <div class="list-actions__info">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="flex-shrink:0;color:var(--color-success)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        <span id="listActionsLabel">Lista lista para exportar</span>
+      </div>
+      <div class="list-actions__btns">
+        <button id="btnDownloadWord" class="list-action-btn list-action-btn--word" type="button">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          Descargar .docx
+        </button>
+        <button id="btnSendGmail" class="list-action-btn list-action-btn--gmail" type="button">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          Enviar por Gmail
+        </button>
+      </div>
+    </div>
+
+    <section class="table-section">
+      <div class="lists-table__wrap">
+        <table class="debts-table" id="listsTable">
+          <thead><tr id="listsTableHead"></tr></thead>
+          <tbody id="listsTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <div id="columnsModal" class="auth-modal hidden">
+    <div class="auth-modal__backdrop" id="columnsModalBackdrop"></div>
+    <div class="auth-modal__dialog" style="max-width: 360px;">
+      <div class="auth-modal__header">
+        <div>
+          <p class="auth-modal__eyebrow">Visualización</p>
+          <h2 class="auth-modal__title" style="font-size: 1.25rem;">Columnas Visibles</h2>
+        </div>
+        <button class="auth-modal__close" id="columnsModalClose">✕</button>
+      </div>
+      <p style="font-size: 0.8rem; color: var(--color-muted); margin-bottom: 12px;">Active o desactive los campos que desea ver reflejados en la tabla del sistema.</p>
+      <div id="columnControls" style="display: flex; flex-direction: column; gap: 6px; padding: 4px 0;"></div>
+    </div>
+  </div>
+
+  <div id="costsModal" class="auth-modal hidden">
+    <div class="auth-modal__backdrop" id="costsModalBackdrop"></div>
+    <div class="auth-modal__dialog" style="max-width: 500px;">
+      <div class="auth-modal__header">
+        <div>
+          <p class="auth-modal__eyebrow">Administración</p>
+          <h2 class="auth-modal__title">Costos de Inscripción</h2>
+        </div>
+        <button class="auth-modal__close" id="costsModalClose">✕</button>
+      </div>
+      
+      <p style="font-size: 0.85rem; color: var(--color-muted); margin-bottom: 15px; line-height: 1.4;">
+        Establece los montos base de cada semestre. Estos valores se guardarán de forma permanente en el servidor.
+      </p>
+
+      <form id="costsForm" class="auth-form" style="gap: 12px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="auth-form__field">
+            <label for="costSem1">1° (Propedéutico)</label>
+            <input type="number" id="costSem1" placeholder="$0.00" min="0" step="0.01" required>
+          </div>
+          <div class="auth-form__field">
+            <label for="costSem2">2° Semestre</label>
+            <input type="number" id="costSem2" placeholder="$0.00" min="0" step="0.01" required>
+          </div>
+          <div class="auth-form__field">
+            <label for="costSem3">3° Semestre</label>
+            <input type="number" id="costSem3" placeholder="$0.00" min="0" step="0.01" required>
+          </div>
+          <div class="auth-form__field">
+            <label for="costSem4">4° Semestre</label>
+            <input type="number" id="costSem4" placeholder="$0.00" min="0" step="0.01" required>
+          </div>
+          <div class="auth-form__field">
+            <label for="costSem5">5° Semestre</label>
+            <input type="number" id="costSem5" placeholder="$0.00" min="0" step="0.01" required>
+          </div>
+          <div class="auth-form__field">
+            <label for="costSem6">6° Semestre</label>
+            <input type="number" id="costSem6" placeholder="$0.00" min="0" step="0.01" required>
+          </div>
+        </div>
+
+        <div class="auth-form__actions" style="margin-top: 15px;">
+          <button type="submit" class="form__button-submit" style="width:100%">Guardar Aranceles Permanentes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="historyModal" class="auth-modal hidden">
+    <div class="auth-modal__backdrop" id="historyModalBackdrop"></div>
+    <div class="auth-modal__dialog modal-historial-fijo">
+      <div class="auth-modal__header">
+        <div>
+          <p class="auth-modal__eyebrow" id="historyStudentMeta">No. Control - Grupo</p>
+          <h2 class="auth-modal__title" id="historyStudentName">Historial Financiero del Alumno</h2>
+        </div>
+        <button class="auth-modal__close" id="historyModalClose">✕</button>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px;">
+        <div style="background: rgba(255,255,255,0.04); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
+          <p style="font-size: 0.75rem; color: var(--color-muted); text-transform: uppercase;">Total Requerido</p>
+          <p id="histStatTotal" style="font-size: 1.3rem; font-weight: bold; color: #fff; margin-top:4px;">$0.00</p>
+        </div>
+        <div style="background: rgba(129, 199, 132, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(129, 199, 132, 0.2); text-align: center;">
+          <p style="font-size: 0.75rem; color: #81c784; text-transform: uppercase;">Total Pagado</p>
+          <p id="histStatPaid" style="font-size: 1.3rem; font-weight: bold; color: #81c784; margin-top:4px;">$0.00</p>
+        </div>
+        <div style="background: rgba(229, 115, 115, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(229, 115, 115, 0.2); text-align: center;">
+          <p style="font-size: 0.75rem; color: #e57373; text-transform: uppercase;">Total Deuda</p>
+          <p id="histStatDebt" style="font-size: 1.3rem; font-weight: bold; color: #e57373; margin-top:4px;">$0.00</p>
+        </div>
+      </div>
+
+      <div class="wrap-historial-fijo">
+        <table class="tabla-historial-compacta">
+          <thead>
+            <tr>
+              <th>Periodo / Concepto</th>
+              <th>Fecha</th>
+              <th>Recibo</th>
+              <th>Costo</th>
+              <th>Abonado</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="gmailModal" class="auth-modal hidden">
+    <div class="auth-modal__backdrop" id="gmailModalBackdrop"></div>
+    <div class="auth-modal__dialog">
+      <div class="auth-modal__header">
+        <div>
+          <p class="auth-modal__eyebrow">Compartir lista</p>
+          <h2 class="auth-modal__title">Enviar por Gmail</h2>
+        </div>
+        <button class="auth-modal__close" id="gmailModalClose">✕</button>
+      </div>
+      <div class="auth-form" style="gap:14px;">
+        <div class="auth-form__field">
+          <label for="gmailTo">Destinatario(s)</label>
+          <input type="email" id="gmailTo" placeholder="correo@ejemplo.com" multiple>
+          <small style="color:var(--color-muted);font-size:0.78rem;">Puedes ingresar varios correos separados por coma.</small>
+        </div>
+        <div class="auth-form__field">
+          <label for="gmailSubject">Asunto</label>
+          <input type="text" id="gmailSubject" placeholder="Lista de asistencia —">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="lists.js"></script>
+</body>
+</html>

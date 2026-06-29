@@ -22,7 +22,7 @@ Les deje una base html css para main.
 - Simple; nada de botones a lo loco; REGLA: nada de uso fuerte o cotidiano debe estar a mas de 2 clicks
             (como el registar un pago, tal como lo deje)
 - simetria del diseño; filas, columnas, secciones, logos, textos deben estar centrados o relativos a una referencia.
-- Paletas de colores; una que no joda la vista usando losm colores de la institucion
+- Paletas de colores; una que no joda la vista usando los mismos colores de la institucion (CBTIS)
             pueden ver teoria del color (recomendable)
 
 ------ PEDIDOS ESPECIFICOS ------

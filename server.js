@@ -1,103 +1,141 @@
-// Cargar variables de entorno desde el archivo .env
+// ==========================================
+// 1. IMPORTACIONES Y CONFIGURACIÓN GLOBAL
+// ==========================================
 require('dotenv').config();
-
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
-const os = require('os');
+const fs = require('fs');
+
+// Configuración de red e IP local
+const { PORT, HOST, getLocalIPAddress } = require('./src/config/network');
+
+// --- DETECTOR AUTOMÁTICO DE RUTAS DE AUTENTICACIÓN ---
+let authControllerPath = '';
+let userRoutesPath = '';
+
+// Buscar authController
+if (fs.existsSync(path.join(__dirname, 'src', 'controllers', 'authController.js'))) {
+    authControllerPath = './src/controllers/authController';
+} else if (fs.existsSync(path.join(__dirname, 'controllers', 'authController.js'))) {
+    authControllerPath = './controllers/authController';
+} else {
+    console.error("❌ ERROR CRÍTICO: No se encuentra 'authController.js' ni en /src/controllers/ ni en /controllers/");
+}
+
+// Buscar userRoutes
+if (fs.existsSync(path.join(__dirname, 'src', 'routes', 'userRoutes.js'))) {
+    userRoutesPath = './src/routes/userRoutes';
+} else if (fs.existsSync(path.join(__dirname, 'routes', 'userRoutes.js'))) {
+    userRoutesPath = './routes/userRoutes';
+} else {
+    console.error("❌ ERROR CRÍTICO: No se encuentra 'userRoutes.js' ni en /src/routes/ ni en /routes/");
+}
+
+// Inyección dinámica de los módulos encontrados
+const { asegurarUsuarioAdmin } = require(authControllerPath);
+const userRoutes = require(userRoutesPath); 
+// -----------------------------------------------------
+
+// Nuevas rutas modulares de control escolar
+const paymentRoutes = require('./src/routes/paymentRoutes');
+const reportRoutes = require('./src/routes/reportRoutes');
+const infoRoutes = require('./src/routes/infoRoutes');
+const syncService = require('./src/services/syncService');
 
 const app = express();
 
+const mongoose = require('mongoose'); // 🟢 Añadir Mongoose
 
-// --- 1. CONFIGURACIÓN DE RED ---
-const PORT = process.env.PORT || 8080;
-const isLanEnabled = process.env.ENABLE_LAN_ACCESS === 'true';
-const isPublicEnabled = process.env.ENABLE_PUBLIC_ACCESS === 'true';
-
-// Por defecto
-let HOST = '127.0.0.1'; 
-
-// Si LAN o Public están activos
-if (isLanEnabled || isPublicEnabled) {
-    HOST = '0.0.0.0';
-}
-
-// --- FUNCIÓN PARA OBTENER LA IP LOCAL (LAN) ---
-function getLocalIPAddress() {
-    const interfaces = os.networkInterfaces();
-    for (const devName in interfaces) {
-        // Ignoramos nombres comunes de adaptadores virtuales
-        if (devName.toLowerCase().includes('vbox') || devName.toLowerCase().includes('vmware') || devName.toLowerCase().includes('wsl')) {
-            continue; 
+// Conexión a MongoDB
+mongoose.connect(process.env.MONGO_URI)
+    .then(async () => {
+        console.log('🔌 ✅ Conectado exitosamente a MongoDB Compass');
+        try {
+            await syncService.ensureIndexes();
+            await syncService.importAlumnosFromExcel();
+        } catch (syncErr) {
+            console.warn('⚠️ Sincronización inicial:', syncErr.message);
         }
-        
-        const iface = interfaces[devName];
-        for (let i = 0; i < iface.length; i++) {
-            const alias = iface[i];
-            if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal) {
-                // Filtramos la subred clásica de VirtualBox por si acaso
-                if (!alias.address.startsWith('192.168.56.')) {
-                    return alias.address;
-                }
-            }
-        }
-    }
-    return '127.0.0.1';
-}
+    })
+    .catch(err => console.error('❌ Error al conectar a MongoDB:', err));
 
+// Ejecutar rutina de verificación del administrador
+asegurarUsuarioAdmin();
 
-// funcionalidad login: JWT.
-/*
-usuario hace login y verifica usuario y contraseña, si es correcto se genera un token JWT con una clave secreta y
-se devuelve al cliente. El cliente lo guarda en localStorage o cookies y lo envía en cada solicitud para autenticación.
-El servidor verifica el token en cada solicitud protegida para permitir o denegar acceso.
-*/
+// ==========================================
+// 2. MIDDLEWARES DE APLICACIÓN (ORDEN CORRECTO)
+// ==========================================
+// 2.1 Procesamiento de Datos entrantes
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-
-
-// --- 2. CONFIGURACIÓN DE SESIONES MULTICLIENTE ---
+// 2.2 Configuración del Manejo de Sesiones (DEBE IR ANTES DE CUALQUIER RUTA O FILTRO)
 app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
+    secret: process.env.SESSION_SECRET || 'default-secret-key-change-in-production',
+    resave: true,
+    saveUninitialized: false,
     cookie: { 
         secure: false,
-        maxAge: 1000 * 60 * 60 * 24
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24, // 24 horas
+        sameSite: 'lax'
     }
 }));
 
+// 2.3 Interceptor de Autenticación Global para la API
+app.use('/api', (req, res, next) => {
+    console.log('[MIDDLEWARE AUTH] Ruta:', req.path, 'Método:', req.method);
+    
+    // Rutas públicas exceptuadas del filtro de sesión
+    if (
+        req.path === '/login'
+        || req.path === '/session'
+        || req.path === '/health'
+        || req.path.startsWith('/recovery/')
+        || req.path === '/solicitud-cuenta'
+        || req.path === '/solicitud-cuenta/estado'
+    ) {
+        return next();
+    }
+    
+    // Si hay sesión activa del usuario, permitimos continuar de forma transparente
+    if (req.session && req.session.user) {
+        return next();
+    }
+    
+    // Si no está logueado, mandamos un JSON real (Evita mandar código HTML inesperado)
+    return res.status(401).json({ error: 'Sesión requerida', code: 'NO_SESSION' });
+});
 
+// ==========================================
+// 3. VINCULACIÓN DE ENRUTADORES
+// ==========================================
+app.use('/api', userRoutes);
+app.use('/api', paymentRoutes);
+app.use('/api', reportRoutes);
+app.use('/api', infoRoutes);
 
-// --- 3. RUTAS Y ARCHIVOS ESTATICOS ---
+// ==========================================
+// 4. ARCHIVOS ESTÁTICOS Y VISTAS (Front-End)
+// ==========================================
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
-    if (req.session.views) {
-        req.session.views++;
-    } else {
-        req.session.views = 1;
-    }
-
+    req.session.views = (req.session.views || 0) + 1;
     console.log(`[Cliente ${req.session.id}] ha visitado la página ${req.session.views} veces.`);
     res.sendFile(path.join(__dirname, 'public', 'main.html'));
 });
 
-
-
-
-
-
-// --- 4. LEVANTAR EL SERVIDOR ---
+// ==========================================
+// 5. INICIALIZACIÓN DEL SERVIDOR
+// ==========================================
 app.listen(PORT, HOST, () => {
     console.log('========================================');
+    console.log('Servidor ejecutándose de forma estructurada.');
+    console.log(`Acceso Local: http://localhost:${PORT}`);
     if (HOST === '0.0.0.0') {
-        const lanIP = getLocalIPAddress();
-        console.log(`Servidor ejecutándose y escuchando en todas las interfaces.`);
-        console.log(`Acceso Local (esta PC): http://localhost:${PORT}`);
-        console.log(`Acceso en LAN (otros dispositivos): http://${lanIP}:${PORT}`);
-    } else {
-        console.log(`Servidor ejecutándose en modo estricto local.`);
-        console.log(`ACCESO: Restringido solo a http://localhost:${PORT}`);
+        console.log(`Acceso en LAN: http://${getLocalIPAddress()}:${PORT}`);
     }
     console.log('========================================');
 });

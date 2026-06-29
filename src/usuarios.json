@@ -1,0 +1,11 @@
+{
+  "admin": {
+    "passwordHash": "$2b$10$MjUus1xwbGJilEXQWjSz.OqNwJOT.MzeygBA9LbPy7Gi7C9ZvwG4.",
+    "role": "admin"
+  },
+  "operador1": {
+    "passwordHash": "$2b$10$ebIyVuaKAXxZyX80uRv8geVNkIzZ0CFkBL5DQYEJqHVS2UhUpYuiS",
+    "role": "operador",
+    "active": true
+  }
+}

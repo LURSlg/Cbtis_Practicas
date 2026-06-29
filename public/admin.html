@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administración — CBTIS</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="page page--admin page--lists">
+
+  <header class="header">
+    <div class="header__brand">
+      <div class="header__logo-placeholder">CBTIS</div>
+      <div>
+        <h1 class="header__title">Panel de Administración</h1>
+        <p class="header__subtitle">Gestión de usuarios, contraseñas y bases de datos por periodo</p>
+      </div>
+    </div>
+    <div class="header__actions">
+      <a href="main.html" class="button-secondary button-secondary--main">← Regresar</a>
+      <div class="header__user-badge" id="headerUserBadge"></div>
+    </div>
+  </header>
+
+  <!-- BLOQUEO: solo admin puede entrar -->
+  <div id="adminLock" class="page-lock">
+    <div class="page-lock__panel">
+      <h2>🔒 Acceso restringido</h2>
+      <p>Solo el administrador del sistema puede acceder a este panel.</p>
+      <button id="adminLockLogin" class="form__button-submit">Iniciar sesión como Admin</button>
+      <a href="main.html" style="display:block;margin-top:12px;color:var(--color-muted);font-size:0.85rem;text-align:center;">Volver al sistema</a>
+    </div>
+  </div>
+
+  <!-- MODAL DE LOGIN (reutilizado para el bloqueo) -->
+  <div id="authModal" class="auth-modal hidden">
+    <div class="auth-modal__backdrop" id="authModalBackdrop"></div>
+    <div class="auth-modal__dialog">
+      <div class="auth-modal__header">
+        <div>
+          <p class="auth-modal__eyebrow">Administración CBTIS</p>
+          <h2 class="auth-modal__title">Acceso de Administrador</h2>
+        </div>
+        <button class="auth-modal__close" id="authModalClose">✕</button>
+      </div>
+      <div class="auth-form">
+        <div class="auth-form__field">
+          <label for="loginUser">Usuario</label>
+          <input type="text" id="loginUser" placeholder="admin">
+        </div>
+        <div class="auth-form__field">
+          <label for="loginPass">Contraseña</label>
+          <input type="password" id="loginPass" placeholder="••••••••">
+        </div>
+        <p class="auth-form__error" id="loginError"></p>
+        <div class="auth-form__actions">
+          <button type="button" class="form__button-submit" id="loginSubmit" style="width:100%">Entrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="page__content page__content--lists" id="adminContent" style="display:none;">
+
+    <!-- NAVEGACIÓN DE SECCIONES -->
+    <nav class="admin-tabs" role="tablist">
+      <button class="admin-tab admin-tab--active" role="tab" data-tab="users">
+        👤 Usuarios y Contraseñas
+      </button>
+      <button class="admin-tab" role="tab" data-tab="solicitudes">
+        📩 Solicitudes <span class="admin-tab__badge hidden" id="solicitudesBadge">0</span>
+      </button>
+      <button class="admin-tab" role="tab" data-tab="database">
+        🗄️ Base de Datos / Periodos
+      </button>
+      <button class="admin-tab" role="tab" data-tab="mypassword">
+        🔑 Mi Contraseña
+      </button>
+    </nav>
+
+    <!-- ════════════════════════════════════════════
+         SECCIÓN 1: USUARIOS
+    ════════════════════════════════════════════ -->
+    <section id="tab-users" class="admin-section">
+
+      <div class="lists-top" style="margin-bottom:0;">
+        <div>
+          <h2 class="lists-title">Gestión de Usuarios</h2>
+          <p class="lists-description">Crea, edita o elimina operadores del sistema. No puedes modificar el usuario <code style="color:#81c784;background:rgba(129,199,132,0.1);padding:2px 6px;border-radius:4px;">admin</code> desde aquí.</p>
+        </div>
+        <div>
+          <button class="form__button-submit" id="btnNewUser" type="button" style="min-width:160px;">
+            + Nuevo usuario
+          </button>
+        </div>
+      </div>
+
+      <div class="lists-table__wrap" style="margin-top:18px;">
+        <table class="debts-table" id="usersTable">
+          <thead>
+            <tr>
+              <th class="debts-table__th">Usuario</th>
+              <th class="debts-table__th">Rol</th>
+              <th class="debts-table__th">Estado</th>
+              <th class="debts-table__th" style="text-align:center;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody">
+            <!-- Renderizado por JS -->
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════
+         SECCIÓN: SOLICITUDES DE CUENTA
+    ════════════════════════════════════════════ -->
+    <section id="tab-solicitudes" class="admin-section hidden">
+
+      <div class="lists-top" style="margin-bottom:0;">
+        <div>
+          <h2 class="lists-title">Solicitudes de acceso</h2>
+          <p class="lists-description">Los operadores pueden solicitar una cuenta desde el login. Aprueba o rechaza en tiempo real.</p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button type="button" class="button-secondary" id="btnRefreshSolicitudes">↻ Actualizar</button>
+        </div>
+      </div>
+
+      <div class="lists-table__wrap" style="margin-top:18px;">
+        <table class="debts-table" id="solicitudesTable">
+          <thead>
+            <tr>
+              <th class="debts-table__th">Usuario</th>
+              <th class="debts-table__th">Nombre</th>
+              <th class="debts-table__th">Motivo</th>
+              <th class="debts-table__th">Fecha</th>
+              <th class="debts-table__th" style="text-align:center;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="solicitudesTableBody">
+            <tr><td class="debts-table__td" colspan="5" style="text-align:center;color:var(--color-muted);">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════
+         SECCIÓN 2: BASE DE DATOS / PERIODOS
+    ════════════════════════════════════════════ -->
+    <section id="tab-database" class="admin-section hidden">
+
+      <div class="lists-top" style="margin-bottom:0;">
+        <div>
+          <h2 class="lists-title">Gestión de Base de Datos</h2>
+          <p class="lists-description">Controla los periodos escolares. La base <strong style="color:#81c784;">activa</strong> es la que el sistema consulta en tiempo real. La <strong style="color:var(--color-muted);">anterior</strong> se conserva solo para historial, no acepta nuevos registros.</p>
+        </div>
+      </div>
+
+      <!-- ESTADO ACTUAL DE PERIODOS -->
+      <div class="db-periods-grid">
+
+        <div class="db-period-card db-period-card--active">
+          <div class="db-period-card__badge">● ACTIVA</div>
+          <h3 class="db-period-card__name" id="dbActiveName">Periodo 2025-B</h3>
+          <p class="db-period-card__meta" id="dbActiveMeta">Cargando...</p>
+          <div class="db-period-card__stats" id="dbActiveStats">
+            <div class="db-period-stat">
+              <span class="db-period-stat__num" id="dbActiveAlumnos">—</span>
+              <span class="db-period-stat__lbl">Alumnos</span>
+            </div>
+            <div class="db-period-stat">
+              <span class="db-period-stat__num" id="dbActivePagados">—</span>
+              <span class="db-period-stat__lbl">Con pago</span>
+            </div>
+          </div>
+          <div class="db-period-card__actions">
+            <button class="list-action-btn" id="btnExportActive" type="button">📥 Exportar CSV</button>
+          </div>
+        </div>
+
+        <div class="db-period-card db-period-card--archive">
+          <div class="db-period-card__badge db-period-card__badge--archive">◌ ANTERIOR</div>
+          <h3 class="db-period-card__name" id="dbArchiveName">—</h3>
+          <p class="db-period-card__meta" id="dbArchiveMeta">Sin periodo archivado</p>
+          <div class="db-period-card__stats" id="dbArchiveStats">
+            <div class="db-period-stat">
+              <span class="db-period-stat__num" id="dbArchiveAlumnos">—</span>
+              <span class="db-period-stat__lbl">Alumnos</span>
+            </div>
+            <div class="db-period-stat">
+              <span class="db-period-stat__num" id="dbArchivePagados">—</span>
+              <span class="db-period-stat__lbl">Con pago</span>
+            </div>
+          </div>
+          <div class="db-period-card__actions">
+            <button class="list-action-btn" id="btnExportArchive" type="button" disabled>📥 Exportar CSV</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ACCIÓN: INICIAR NUEVO PERIODO -->
+      <div class="db-new-period">
+        <div class="db-new-period__header">
+          <h3>Iniciar nuevo periodo escolar</h3>
+          <p>La base activa pasará a ser la anterior. Se creará una nueva base vacía como activa. <strong style="color:var(--color-warning);">Esta acción no se puede deshacer.</strong></p>
+        </div>
+        <div class="db-new-period__form">
+          <div class="form__group">
+            <label class="form__label" for="newPeriodName">Nombre del nuevo periodo</label>
+            <input type="text" class="form__input" id="newPeriodName" placeholder="Ej: 2026-A">
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="newPeriodStart">Fecha de inicio</label>
+            <input type="date" class="form__input" id="newPeriodStart">
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="newPeriodEnd">Fecha de cierre estimada</label>
+            <input type="date" class="form__input" id="newPeriodEnd">
+          </div>
+          <button type="button" class="form__button-submit" id="btnNewPeriod" style="align-self:flex-end;min-width:200px;">
+            🔄 Iniciar nuevo periodo
+          </button>
+        </div>
+      </div>
+
+      <!-- IMPORTAR ALUMNOS DE NUEVO INGRESO -->
+      <div class="db-import">
+        <div class="db-import__header">
+          <h3>Importar alumnos de nuevo ingreso</h3>
+          <p>Carga un archivo CSV con los alumnos del periodo activo. El formato esperado es: <code style="color:#81c784;">NO_CONTROL,NOMBRE,AP_PATERNO,AP_MATERNO,CARRERA,SEMESTRE,GRUPO,TURNO</code></p>
+        </div>
+        <div class="db-import__actions">
+          <label class="list-action-btn" style="cursor:pointer;">
+            📂 Seleccionar CSV
+            <input type="file" id="importCSV" accept=".csv" style="display:none;">
+          </label>
+          <button type="button" class="form__button-submit" id="btnImport" disabled style="min-width:160px;">
+            Importar al periodo activo
+          </button>
+          <span id="importFileName" style="color:var(--color-muted);font-size:0.85rem;align-self:center;"></span>
+        </div>
+        <div id="importPreview" class="db-import__preview hidden">
+          <p id="importPreviewMsg" style="color:var(--color-muted);font-size:0.85rem;"></p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ════════════════════════════════════════════
+         SECCIÓN 3: MI CONTRASEÑA (admin)
+    ════════════════════════════════════════════ -->
+    <section id="tab-mypassword" class="admin-section hidden">
+      <div class="lists-top" style="margin-bottom:0;">
+        <div>
+          <h2 class="lists-title">Configuración de Seguridad</h2>
+          <p class="lists-description">Actualiza tu contraseña y gestiona tu pregunta de recuperación de datos.</p>
+        </div>
+      </div>
+
+      <div class="password-form-wrap">
+        <div class="auth-form" style="max-width:400px;gap:16px;">
+          <div class="auth-form__field">
+            <label for="currentPass">Contraseña actual</label>
+            <input type="password" id="currentPass" placeholder="••••••••">
+          </div>
+          <div class="auth-form__field">
+            <label for="newPass">Nueva contraseña</label>
+            <input type="password" id="newPass" placeholder="••••••••">
+          </div>
+          <div class="auth-form__field">
+            <label for="confirmPass">Confirmar nueva contraseña</label>
+            <input type="password" id="confirmPass" placeholder="••••••••">
+          </div>
+
+          <hr style="border: 0; border-top: 1px solid var(--color-border); margin: 8px 0;">
+          
+          <div class="auth-form__field">
+            <label for="securityQuestion">Pregunta Secreta de Recuperación</label>
+            <select id="securityQuestion" class="form__select" style="background:var(--color-background); width: 100%; padding: 8px; border-radius: 4px; color: white;">
+              <option value="¿Cuál es el nombre de tu primera mascota?">¿Cuál es el nombre de tu primera mascota?</option>
+              <option value="¿En qué ciudad nació tu madre?">¿En qué ciudad nació tu madre?</option>
+              <option value="¿Cuál era el nombre de tu primera escuela?">¿Cuál era el nombre de tu primera escuela?</option>
+              <option value="¿Cuál es tu libro o película favorita?">¿Cuál es tu libro o película favorita?</option>
+            </select>
+          </div>
+          <div class="auth-form__field">
+            <label for="securityAnswer">Respuesta Secreta</label>
+            <input type="password" id="securityAnswer" placeholder="Escribe tu respuesta aquí">
+            <small style="color:var(--color-muted);font-size:0.78rem;">Esta respuesta te permitirá restaurar tu acceso si olvidas la contraseña.</small>
+          </div>
+
+          <p class="auth-form__error" id="passError"></p>
+          <p id="passSuccess" style="color:var(--color-success);font-size:0.9rem;min-height:1.2rem;"></p>
+          <button type="button" class="form__button-submit" id="btnChangePass" style="width:100%">
+            Actualizar credenciales
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: CREAR/EDITAR USUARIO -->
+  <div id="userModal" class="auth-modal hidden">
+    <div class="auth-modal__backdrop" id="userModalBackdrop"></div>
+    <div class="auth-modal__dialog">
+      <div class="auth-modal__header">
+        <div>
+          <p class="auth-modal__eyebrow" id="userModalEyebrow">Nuevo operador</p>
+          <h2 class="auth-modal__title" id="userModalTitle">Crear usuario</h2>
+        </div>
+        <button class="auth-modal__close" id="userModalClose">✕</button>
+      </div>
+      <div class="auth-form" style="gap:14px;">
+        <input type="hidden" id="userModalMode" value="create">
+        <input type="hidden" id="userModalOriginalUsername">
+        <div class="auth-form__field">
+          <label for="umUsername">Nombre de usuario</label>
+          <input type="text" id="umUsername" placeholder="operador01">
+        </div>
+        <div class="auth-form__field" id="umPasswordField">
+          <label for="umPassword">Contraseña</label>
+          <input type="password" id="umPassword" placeholder="••••••••">
+          <small style="color:var(--color-muted);font-size:0.78rem;" id="umPasswordHint">Déjalo vacío para no cambiar la contraseña.</small>
+        </div>
+        <div class="auth-form__field">
+          <label for="umRol">Rol</label>
+          <select id="umRol" class="form__select" style="background:var(--color-background);">
+            <option value="operador">Operador</option>
+            <option value="supervisor">Supervisor</option>
+          </select>
+        </div>
+        <div class="auth-form__field">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" id="umActivo" checked style="accent-color:var(--color-primary-hover);">
+            Usuario activo
+          </label>
+        </div>
+        <p class="auth-form__error" id="userModalError"></p>
+        <div class="auth-form__actions">
+          <button type="button" class="form__button-submit" id="userModalSave" style="width:100%">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIRMAR NUEVO PERIODO -->
+  <div id="periodConfirmModal" class="auth-modal hidden">
+    <div class="auth-modal__backdrop"></div>
+    <div class="auth-modal__dialog">
+      <div class="auth-modal__header">
+        <div>
+          <p class="auth-modal__eyebrow">Confirmación requerida</p>
+          <h2 class="auth-modal__title">¿Iniciar nuevo periodo?</h2>
+        </div>
+      </div>
+      <div style="padding:0 0 16px;">
+        <p style="color:var(--color-text);line-height:1.6;margin-bottom:16px;" id="periodConfirmMsg">
+          La base de datos activa pasará a historial y se creará una nueva vacía.
+        </p>
+        <p style="color:var(--color-warning);font-size:0.88rem;">⚠️ Esta acción es irreversible.</p>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button type="button" class="button-secondary" id="periodConfirmCancel">Cancelar</button>
+        <button type="button" class="form__button-submit" id="periodConfirmOk" style="min-width:160px;">Sí, iniciar nuevo periodo</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

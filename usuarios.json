@@ -1,8 +1,13 @@
 {
-    "admin": {
-        "password": "admin123"
-    },
-    "saymon": {
-        "password": "11223344"
+  "admin": {
+    "passwordHash": "$2b$10$dKShN35UZYtFGt76BNTV2Ohuay6S60Lk8An6MJD0eP4pRGcC9SWwe",
+    "role": "admin",
+    "securityQuestion": {
+      "question": "¿Cuál es el nombre de tu primera mascota?",
+      "answerHash": "$2b$10$KR1vksYflm23Go02OwJl4ux4s6OY7wTuDlrH4tohwehv/cLN1sJmy"
     }
+  },
+  "saymon": {
+    "password": "11223344"
+  }
 }
