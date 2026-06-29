@@ -7,6 +7,41 @@ const syncService = require('../services/syncService');
 const { getCurrentAcademicPeriod, computeCurrentSemesterForStudent } = require('../utils/academic');
 const { formatStudentForApi, getApellidosDisplay } = require('../utils/studentHelper');
 
+
+
+// UBICACIÓN: src/controllers/infoController.js (o similar)
+const excelService = require('../services/excelService'); 
+
+exports.obtenerCarrerasUnicas = async (req, res) => {
+    try {
+        // 1. Leemos todos los alumnos desde el archivo maestro Excel utilizando tu servicio
+        const alumnos = excelService.readAlumnosFromExcel();
+        
+        if (!alumnos || alumnos.length === 0) {
+            return res.json({ success: true, carreras: [] });
+        }
+
+        // 2. Extraemos el campo 'carrera', limpiamos espacios y descartamos vacíos
+        const mapeoCarreras = alumnos.map(alumno => {
+            return alumno.carrera ? alumno.carrera.trim().toUpperCase() : '';
+        });
+
+        // 3. Usamos un Set para eliminar automáticamente los duplicados
+        const carrerasUnicas = [...new Set(mapeoCarreras)]
+            .filter(carrera => carrera !== '') // Quitamos filas en blanco
+            .sort(); // Las ordenamos de la A a la Z
+
+        // 4. Respondemos al Frontend
+        return res.json({ success: true, carreras: carrerasUnicas });
+
+    } catch (error) {
+        console.error('❌ Error al procesar carreras únicas de Excel:', error);
+        return res.status(500).json({ error: 'Error interno al procesar el archivo Excel' });
+    }
+};
+
+
+
 function escapeRegex(value) {
     return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
