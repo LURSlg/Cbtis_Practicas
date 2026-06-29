@@ -301,5 +301,75 @@
   </div>
 
   <script src="lists.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const selectCarrera = document.getElementById('carreraFilter');
+      const selectTurno = document.getElementById('turnoFilter');
+      const selectGrupo = document.getElementById('grupoFilter');
+
+      if (selectCarrera) {
+        selectCarrera.innerHTML = '<option value="">Cargando especialidades...</option>';
+        
+        fetch('/api/info/carreras', { cache: 'no-store' })
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.success && data.carreras && data.carreras.length > 0) {
+              selectCarrera.innerHTML = '<option value="">Todas</option>';
+              data.carreras.forEach(carrera => {
+                const option = document.createElement('option');
+                option.value = carrera.trim().toUpperCase();
+                option.textContent = normalizarTextoFiltros(carrera);
+                selectCarrera.appendChild(option);
+              });
+            } else {
+              selectCarrera.innerHTML = '<option value="">Todas (Sin registros)</option>';
+            }
+            // Disparar evento de cambio por si lists.js necesita refrescar la tabla de inmediato
+            selectCarrera.dispatchEvent(new Event('change'));
+          })
+          .catch(err => {
+            console.error('Error inyectando carreras en filtros:', err);
+            selectCarrera.innerHTML = '<option value="">Todas</option>';
+          });
+      }
+
+      // Adicional: Si tu API de backend expone también los turnos y grupos únicos, 
+      // los puedes rellenar aquí. Si no, metemos valores estándar automatizados.
+      if (selectTurno && selectTurno.options.length <= 1) {
+         selectTurno.innerHTML = `
+           <option value="">Todos</option>
+           <option value="MATUTINO">Matutino</option>
+           <option value="VESPERTINO">Vespertino</option>
+         `;
+      }
+
+      if (selectGrupo && selectGrupo.options.length <= 1) {
+         selectGrupo.innerHTML = `
+           <option value="">Todos</option>
+           <option value="A">A</option>
+           <option value="B">B</option>
+           <option value="C">C</option>
+           <option value="D">D</option>
+           <option value="E">E</option>
+           <option value="F">F</option>
+         `;
+      }
+
+      function normalizarTextoFiltros(texto) {
+        if (!texto) return '';
+        return texto
+          .toLowerCase()
+          .split(' ')
+          .map((palabra, index) => {
+            if (['de', 'y', 'en', 'del', 'los', 'las'].includes(palabra) && index !== 0) {
+              return palabra;
+            }
+            return palabra.charAt(0).toUpperCase() + palabra.slice(1);
+          })
+          .join(' ');
+      }
+    });
+  </script>
 </body>
 </html>
