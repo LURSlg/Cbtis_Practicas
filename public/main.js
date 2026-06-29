@@ -24,6 +24,7 @@ let currentStudentData = null;
 
 async function initApp() {
     resetFormularyState();
+    inicializarCarrerasDinamicas(); // 👈 Carga las carreras desde el Excel al arrancar
     await loadTurnoResumen();
     await loadTurnoMovimientos();
     startHealthMonitor();
@@ -195,29 +196,60 @@ function fillAlumnoFieldsFromServer(student) {
     document.getElementById('nombre').value = student.nombre || '';
     document.getElementById('apellido_paterno').value = student.apellido_paterno || '';
     document.getElementById('apellido_materno').value = student.apellido_materno || '';
-    resolveCarreraOption(student.carrera || '');
+    
+    // Selecciona automáticamente la opción correcta basándose en el string del Excel
+    const carreraSelect = document.getElementById('carrera');
+    if (carreraSelect && student.carrera) {
+        carreraSelect.value = student.carrera.trim().toUpperCase();
+    } else if (carreraSelect) {
+        carreraSelect.value = '';
+    }
 }
 
-function resolveCarreraOption(carrera) {
-    const carreraSelect = document.getElementById('carrera');
-    if (!carrera) {
-        carreraSelect.value = '';
-        return;
-    }
-    const normalized = carrera.trim().toUpperCase();
-    const existing = Array.from(carreraSelect.options).find(opt => {
-        const optText = opt.textContent.toUpperCase();
-        return optText.includes(normalized) || normalized.includes(optText.split('/')[0].trim());
-    });
-    if (existing) {
-        carreraSelect.value = existing.value;
-        return;
-    }
-    const newOption = document.createElement('option');
-    newOption.value = normalized.toLowerCase().replace(/\s+/g, '_');
-    newOption.textContent = carrera;
-    carreraSelect.appendChild(newOption);
-    carreraSelect.value = newOption.value;
+// ==========================================================================
+// FUNCIÓN AUTO-FILL: EXTRAE LAS CARRERAS DEL EXCEL DE FORMA DINÁMICA
+// ==========================================================================
+function inicializarCarrerasDinamicas() {
+    const selectCarrera = document.getElementById('carrera');
+    if (!selectCarrera) return;
+
+    selectCarrera.innerHTML = '<option value="">Cargando especialidades oficiales...</option>';
+
+    fetch('/api/info/carreras', { cache: 'no-store' })
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.success && data.carreras && data.carreras.length > 0) {
+                selectCarrera.innerHTML = '<option value="">- Seleccione Especialidad -</option>';
+                
+                data.carreras.forEach(carrera => {
+                    const option = document.createElement('option');
+                    // Almacena el valor idéntico al Excel en mayúsculas sostenidas para el match perfecto
+                    option.value = carrera.trim().toUpperCase(); 
+                    option.textContent = normalizarTextoCarrera(carrera);
+                    selectCarrera.appendChild(option);
+                });
+            } else {
+                selectCarrera.innerHTML = '<option value="">No se encontraron especialidades en Excel</option>';
+            }
+        })
+        .catch(err => {
+            console.error('❌ Error cargando las carreras en el formulario:', err);
+            selectCarrera.innerHTML = '<option value="">Error al conectar con la base de datos Excel</option>';
+        });
+}
+
+function normalizarTextoCarrera(texto) {
+    if (!texto) return '';
+    return texto
+        .toLowerCase()
+        .split(' ')
+        .map((palabra, index, arr) => {
+            if (['de', 'y', 'en', 'del', 'los', 'las'].includes(palabra) && index !== 0) {
+                return palabra;
+            }
+            return palabra.charAt(0).toUpperCase() + palabra.slice(1);
+        })
+        .join(' ');
 }
 
 function renderDebtsFromServer(data) {
@@ -362,7 +394,7 @@ async function registrarPagoBackend(controlId, semesterNum, fromForm = false) {
         payload.nombre = document.getElementById('nombre').value.trim();
         payload.paterno = document.getElementById('apellido_paterno').value.trim();
         payload.materno = document.getElementById('apellido_materno').value.trim();
-        payload.carrera = document.getElementById('carrera').selectedOptions[0]?.textContent || document.getElementById('carrera').value;
+        payload.carrera = document.getElementById('carrera').value; // Manda el string limpio del Excel
     }
 
     try {
